@@ -5,7 +5,7 @@
       "nom": "Baba Fall",
       "email": "baba@gmail.com",
       "password": "passer",
-      "photo": "/home/babaissa/Documents/test221Ecole/todobis/fond-d'ecran.jpg",
+      "photo": "path/to/user/photo.jpg",
       "order": 1
     }
   ],
@@ -16,7 +16,7 @@
       "titre": "Cours php",
       "description": "Languages web et mobile très complexe",
       "date": "2024-01-12",
-      "completed": true,
+      "completed": false,
       "libelle": "Programmation",
       "order": 0
     },
@@ -26,9 +26,9 @@
       "titre": "Ruby",
       "description": "Language",
       "date": "2025-01-25",
-      "completed": true,
+      "completed": false,
       "libelle": "Non classé",
-      "order": 1
+      "order": 2
     },
     {
       "id": "dc6c",
@@ -38,7 +38,7 @@
       "date": "2025-01-24",
       "completed": false,
       "libelle": "Non classé",
-      "order": 2
+      "order": 1
     }
   ]
 }

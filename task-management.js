@@ -130,19 +130,12 @@ export const updateTask = async () => {
 
 // Render tasks to the UI
 const renderTasks = (tasks) => {
-    // Clear existing tasks
     const existingTasks = document.querySelectorAll('.task-card');
     existingTasks.forEach(task => task.remove());
-    
-    // Render new tasks
+
     tasks.forEach(task => {
         const taskCard = createTaskCard(task);
-        const addButton = document.querySelector('.add-button');
-        if (addButton) {
-            addButton.parentNode.insertBefore(taskCard, addButton);
-        } else {
-            taskContainer.appendChild(taskCard);
-        }
+        taskContainer.appendChild(taskCard);
     });
 };
 
@@ -264,16 +257,10 @@ export const filterAndSearchTasks = async (filterValue, searchQuery) => {
 const initializeDragAndDrop = () => {
     const taskCards = document.querySelectorAll('.task-card');
     taskCards.forEach(card => {
-        card.removeEventListener('dragstart', handleDragStart);
-        card.removeEventListener('dragend', handleDragEnd);
-        
         card.addEventListener('dragstart', handleDragStart);
         card.addEventListener('dragend', handleDragEnd);
     });
 
-    taskContainer.removeEventListener('dragover', handleDragOver);
-    taskContainer.removeEventListener('drop', handleDrop);
-    
     taskContainer.addEventListener('dragover', handleDragOver);
     taskContainer.addEventListener('drop', handleDrop);
 };
@@ -285,12 +272,13 @@ function handleDragStart(e) {
 }
 
 // Drag end handler
+
+// Drag over handler
 function handleDragEnd() {
     this.classList.remove('dragging');
     updateTaskOrder();
 }
 
-// Drag over handler
 function handleDragOver(e) {
     e.preventDefault();
     const draggingElement = document.querySelector('.dragging');
@@ -302,8 +290,21 @@ function handleDragOver(e) {
         taskContainer.appendChild(draggingElement);
     }
 }
+function handleDrop(e) {
+    e.preventDefault();
+    const taskId = e.dataTransfer.getData('text/plain');
+    const draggingElement = document.querySelector(`[data-task-id="${taskId}"]`);
+    
+    const afterElement = getDragAfterElement(e.clientY);
+    if (afterElement) {
+        taskContainer.insertBefore(draggingElement, afterElement);
+    } else {
+        taskContainer.appendChild(draggingElement);
+    }
 
-// Get element to insert after during drag
+    updateTaskOrder();
+}
+
 function getDragAfterElement(y) {
     const draggableElements = [...taskContainer.querySelectorAll('.task-card:not(.dragging)')];
 
@@ -318,7 +319,6 @@ function getDragAfterElement(y) {
         }
     }, {}).element;
 }
-
 // Update task order after drag and drop
 async function updateTaskOrder() {
     try {
