@@ -120,3 +120,22 @@ document.addEventListener('DOMContentLoaded', () => {
         loginForm.addEventListener('submit', handleLogin);
     }
 });
+function logout() {
+    // Clear localStorage
+    localStorage.removeItem('user');
+    
+    // Redirect to login page
+    window.location.href = 'login.html';
+}
+
+// Add event listener to logout button
+document.getElementById('logout').addEventListener('click', logout);
+
+// Add protection to ensure only logged-in users can access this page
+document.addEventListener('DOMContentLoaded', () => {
+    const user = localStorage.getItem('user');
+    if (!user) {
+        // If no user is logged in, redirect to login page
+        window.location.href = 'login.html';
+    }
+});
