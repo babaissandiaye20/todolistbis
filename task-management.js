@@ -72,6 +72,24 @@ export const editTask = async (taskId) => {
         console.error('Error fetching task details:', error);
     }
 };
+// Add this function to delete a task
+export const deleteTask = async (taskId) => {
+    // Create a custom confirmation dialog
+    const confirmDelete = confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?');
+    
+    if (confirmDelete) {
+        try {
+            await fetchDeleteData(`http://localhost:3000/tasks/${taskId}`);
+            await loadUserTasks();
+        } catch (error) {
+            console.error('Error deleting task:', error);
+            alert('Impossible de supprimer la tâche. Réessayez.');
+        }
+    }
+};
+
+// Update the global function handlers
+window.deleteTask = deleteTask;
 
 // Update task functionality
 export const updateTask = async () => {
@@ -158,7 +176,7 @@ const createTaskCard = (task) => {
                 <p class="mt-2 whitespace-pre-line">${task.description}</p>
             </div>
         </div>
-        <button class="icon-button absolute bottom-4 right-6 w-[54px] h-[25px] bg-black flex items-center justify-center rounded hover:bg-gray-800 transition-colors">
+       <button onclick="deleteTask('${task.id}')" class="icon-button absolute bottom-4 right-6 w-[54px] h-[25px] bg-black flex items-center justify-center rounded hover:bg-gray-800 transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M3 6h18"></path>
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -419,7 +437,7 @@ window.editTask = editTask;
 window.updateTask = updateTask;
 window.addTask = addTask;
 window.closeModal = closeModal;
-
+window.deleteTask = deleteTask;
 // Event listeners setup
 function setupEventListeners() {
     const searchInput = document.querySelector('.search-container input');

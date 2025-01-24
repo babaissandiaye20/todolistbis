@@ -11,26 +11,6 @@
   ],
   "tasks": [
     {
-      "id": "1",
-      "userId": 1,
-      "titre": "Cours Java",
-      "description": "Languages web et mobile très complexe",
-      "date": "2024-01-12",
-      "completed": true,
-      "libelle": "Programmation",
-      "order": 3
-    },
-    {
-      "id": "2",
-      "userId": 1,
-      "titre": "Cours Python",
-      "description": "Apprendre les bases de Python",
-      "date": "2024-01-15",
-      "completed": true,
-      "libelle": "Programmation",
-      "order": 2
-    },
-    {
       "id": "3",
       "userId": 1,
       "titre": "Cours php",
@@ -38,7 +18,7 @@
       "date": "2024-01-12",
       "completed": true,
       "libelle": "Programmation",
-      "order": 1
+      "order": 0
     },
     {
       "id": "f094",
@@ -48,27 +28,17 @@
       "date": "2025-01-25",
       "completed": true,
       "libelle": "Non classé",
-      "order": 4
+      "order": 1
     },
     {
-      "id": "b69e",
+      "id": "dc6c",
       "userId": "1",
-      "titre": "Ruby",
-      "description": "Language",
+      "titre": "Javascript",
+      "description": "Language de programmation",
       "date": "2025-01-24",
-      "completed": true,
-      "libelle": "Non classé",
-      "order": 0
-    },
-    {
-      "id": "b23f",
-      "userId": "1",
-      "titre": "Assambly",
-      "description": "Bas niveau",
-      "date": "2025-01-26",
       "completed": false,
       "libelle": "Non classé",
-      "order": 0
+      "order": 2
     }
   ]
 }
