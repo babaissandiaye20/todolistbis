@@ -7,6 +7,14 @@
       "password": "passer",
       "photo": "path/to/user/photo.jpg",
       "order": 1
+    },
+    {
+      "id": "2",
+      "nom": "Baba Ndiaye",
+      "email": "baba2@gmail.com",
+      "password": "passer",
+      "photo": "path/to/user/photo.jpg",
+      "order": 1
     }
   ],
   "tasks": [
@@ -18,7 +26,7 @@
       "date": "2024-01-12",
       "completed": false,
       "libelle": "Programmation",
-      "order": 0
+      "order": 1
     },
     {
       "id": "f094",
@@ -36,6 +44,26 @@
       "titre": "Javascript",
       "description": "Language de programmation",
       "date": "2025-01-24",
+      "completed": false,
+      "libelle": "Non classé",
+      "order": 0
+    },
+    {
+      "id": "8074",
+      "userId": "2",
+      "titre": "Philo",
+      "description": "Matière de fou pour personne san intêtes",
+      "date": "2025-01-20",
+      "completed": true,
+      "libelle": "Non classé",
+      "order": 0
+    },
+    {
+      "id": "c0f3",
+      "userId": "2",
+      "titre": "Math",
+      "description": "Matières nantée",
+      "date": "2025-01-27",
       "completed": false,
       "libelle": "Non classé",
       "order": 1
