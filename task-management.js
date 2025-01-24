@@ -1,21 +1,14 @@
-import { fetchGetData,fetchPutData } from "./fetch.js";
+import { fetchGetData, fetchPutData, fetchPostData, fetchDeleteData } from "./fetch.js";
+
 const taskContainer = document.querySelector('.task-container');
 
+// Load and initialize user tasks
 export const loadUserTasks = async () => {
     const user = JSON.parse(localStorage.getItem('user'));
     const userId = user ? user.id : null;
     
-    // Update welcome message with user's name
-    const welcomeHeader = document.querySelector('h1');
-    if (welcomeHeader && user) {
-        welcomeHeader.textContent = `Bonjour ${user.nom}`;
-    }
-
-    // Update profile image if available
-    const profileImage = document.querySelector('.rounded-full img');
-    if (profileImage && user && user.photo) {
-        profileImage.src = user.photo;
-    }
+    // Update welcome and profile sections
+    updateUserInterface(user);
 
     if (!userId) {
         console.error('No user ID found');
@@ -25,40 +18,57 @@ export const loadUserTasks = async () => {
     try {
         const data = await fetchGetData('http://localhost:3000/tasks');
         
-        // Filter tasks for the current user
         const userTasks = data
             .filter(task => task.userId == userId)
             .sort((a, b) => (a.order || 0) - (b.order || 0));
         
-        // Update stats
+        renderTasks(userTasks);
         updateTaskStats(userTasks);
-        
-        // Clear existing tasks
-        const existingTasks = document.querySelectorAll('.task-card');
-        existingTasks.forEach(task => task.remove());
-        
-        // Render tasks
-        userTasks.forEach(task => {
-            const taskCard = createTaskCard(task);
-            const addButton = document.querySelector('.add-button');
-            if (addButton) {
-                addButton.parentNode.insertBefore(taskCard, addButton);
-            } else {
-                taskContainer.appendChild(taskCard);
-            }
-        });
-
-        // Re-initialize drag and drop
         initializeDragAndDrop();
     } catch (error) {
         console.error('Error loading tasks:', error);
     }
 };
 
+// Update user interface elements
+const updateUserInterface = (user) => {
+    if (!user) return;
+
+    const welcomeHeader = document.querySelector('h1');
+    if (welcomeHeader) {
+        welcomeHeader.textContent = `Bonjour ${user.nom}`;
+    }
+
+    const profileImage = document.querySelector('.rounded-full img');
+    if (profileImage && user.photo) {
+        profileImage.src = user.photo;
+    }
+};
+
+// Render tasks to the UI
+const renderTasks = (tasks) => {
+    // Clear existing tasks
+    const existingTasks = document.querySelectorAll('.task-card');
+    existingTasks.forEach(task => task.remove());
+    
+    // Render new tasks
+    tasks.forEach(task => {
+        const taskCard = createTaskCard(task);
+        const addButton = document.querySelector('.add-button');
+        if (addButton) {
+            addButton.parentNode.insertBefore(taskCard, addButton);
+        } else {
+            taskContainer.appendChild(taskCard);
+        }
+    });
+};
+
+// Create task card HTML
 const createTaskCard = (task) => {
     const taskCard = document.createElement('div');
     taskCard.className = 'task-card bg-[#F5F5DC] p-6 mb-6 rounded relative';
     taskCard.dataset.taskId = task.id; 
+    taskCard.setAttribute('draggable', 'true');
     taskCard.innerHTML = `
         <div class="flex items-start gap-4">
             <button onclick="toggleTask(this)" class="w-12 h-12 bg-[#D3D3D3] mt-2 flex items-center justify-center rounded transition-colors hover:bg-gray-300">
@@ -93,6 +103,7 @@ const createTaskCard = (task) => {
     return taskCard;
 };
 
+// Update task statistics
 const updateTaskStats = (tasks) => {
     const completedTasks = tasks.filter(task => task.completed).length;
     const inProgressTasks = tasks.filter(task => !task.completed).length;
@@ -104,6 +115,7 @@ const updateTaskStats = (tasks) => {
     if (inProgressSpan) inProgressSpan.textContent = `${inProgressTasks} en cours`;
 };
 
+// Format date for display
 const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('fr-FR', { 
@@ -113,6 +125,7 @@ const formatDate = (dateString) => {
     });
 };
 
+// Toggle task completion
 export const toggleTaskCompletion = async (taskId) => {
     try {
         const response = await fetch(`http://localhost:3000/tasks/${taskId}`);
@@ -123,19 +136,14 @@ export const toggleTaskCompletion = async (taskId) => {
             completed: !task.completed
         };
 
-        const updatedResponse = await fetchPutData(`http://localhost:3000/tasks/${taskId}`, updatedTask);
-        
-        if (updatedResponse) {
-            loadUserTasks();
-        }
-
-        return updatedResponse;
+        await fetchPutData(`http://localhost:3000/tasks/${taskId}`, updatedTask);
+        await loadUserTasks();
     } catch (error) {
         console.error('Error toggling task completion:', error);
-        return null;
     }
 };
 
+// Filter and search tasks
 export const filterAndSearchTasks = async (filterValue, searchQuery) => {
     const user = JSON.parse(localStorage.getItem('user'));
     const userId = user ? user.id : null;
@@ -161,130 +169,198 @@ export const filterAndSearchTasks = async (filterValue, searchQuery) => {
         
         userTasks.sort((a, b) => (a.order || 0) - (b.order || 0));
         
+        renderTasks(userTasks);
         updateTaskStats(userTasks);
-        
-        const existingTasks = document.querySelectorAll('.task-card');
-        existingTasks.forEach(task => task.remove());
-        
-        userTasks.forEach(task => {
-            const taskCard = createTaskCard(task);
-            const addButton = document.querySelector('.add-button');
-            if (addButton) {
-                addButton.parentNode.insertBefore(taskCard, addButton);
-            } else {
-                taskContainer.appendChild(taskCard);
-            }
-        });
+        initializeDragAndDrop();
     } catch (error) {
         console.error('Error filtering tasks:', error);
     }
 };
 
-function toggleTask(button) {
-    const taskCard = button.closest('.task-card');
-    const taskId = taskCard.dataset.taskId;
-    
-    toggleTaskCompletion(taskId);
-}
-
+// Drag and Drop initialization
 const initializeDragAndDrop = () => {
-    const taskContainer = document.querySelector('.task-container');
+    const taskCards = document.querySelectorAll('.task-card');
+    taskCards.forEach(card => {
+        card.removeEventListener('dragstart', handleDragStart);
+        card.removeEventListener('dragend', handleDragEnd);
+        
+        card.addEventListener('dragstart', handleDragStart);
+        card.addEventListener('dragend', handleDragEnd);
+    });
+
+    taskContainer.removeEventListener('dragover', handleDragOver);
+    taskContainer.removeEventListener('drop', handleDrop);
     
-    taskContainer.addEventListener('dragstart', handleDragStart);
     taskContainer.addEventListener('dragover', handleDragOver);
     taskContainer.addEventListener('drop', handleDrop);
-    taskContainer.addEventListener('dragend', handleDragEnd);
+};
 
-    function handleDragStart(e) {
-        const taskCard = e.target.closest('.task-card');
-        if (!taskCard) return;
-
-        e.dataTransfer.setData('text/plain', taskCard.dataset.taskId);
-        taskCard.classList.add('dragging');
-    }
-
-    function handleDragOver(e) {
-        e.preventDefault();
-        const draggingElement = document.querySelector('.dragging');
-        const afterElement = getDragAfterElement(taskContainer, e.clientY);
-
-        if (afterElement) {
-            taskContainer.insertBefore(draggingElement, afterElement);
-        } else {
-            taskContainer.appendChild(draggingElement);
-        }
-    }
-
-    function handleDrop(e) {
-        e.preventDefault();
-        updateTaskOrder();
-    }
-
-    function handleDragEnd(e) {
-        const taskCard = e.target.closest('.task-card');
-        if (taskCard) {
-            taskCard.classList.remove('dragging');
-        }
-    }
-
-    function getDragAfterElement(container, y) {
-        const draggableElements = [...container.querySelectorAll('.task-card:not(.dragging)')];
-
-        return draggableElements.reduce((closest, child) => {
-            const box = child.getBoundingClientRect();
-            const offset = y - box.top - box.height / 2;
-            
-            if (offset < 0 && offset > closest.offset) {
-                return { offset: offset, element: child };
-            } else {
-                return closest;
-            }
-        }, { offset: Number.NEGATIVE_INFINITY }).element;
-    }
-
-    async function updateTaskOrder() {
-        try {
-            const taskCards = document.querySelectorAll('.task-card');
-            const updatedTasks = [];
-
-            taskCards.forEach((card, index) => {
-                updatedTasks.push({ 
-                    id: card.dataset.taskId, 
-                    order: index 
-                });
-            });
-
-            const currentTasks = await fetchGetData('http://localhost:3000/tasks');
-
-            const updatePromises = updatedTasks.map(async (updatedTask) => {
-                const fullTaskDetails = currentTasks.find(task => task.id == updatedTask.id);
-                if (fullTaskDetails) {
-                    const taskToUpdate = {
-                        ...fullTaskDetails,
-                        order: updatedTask.order
-                    };
-                    return fetchPutData(`http://localhost:3000/tasks/${updatedTask.id}`, taskToUpdate);
-                }
-            });
-
-            await Promise.all(updatePromises);
-            console.log('Ordre des tâches mis à jour');
-        } catch (error) {
-            console.error('Erreur lors de la mise à jour de l\'ordre:', error);
-        }
-    }
-
-    document.querySelectorAll('.task-card').forEach(card => {
-        card.setAttribute('draggable', 'true');
-    });
+// Drag start handler
+function handleDragStart(e) {
+    e.dataTransfer.setData('text/plain', this.dataset.taskId);
+    this.classList.add('dragging');
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    loadUserTasks();
-    setTimeout(initializeDragAndDrop, 100);
-    
-    // Filter dropdown
+// Drag end handler
+function handleDragEnd() {
+    this.classList.remove('dragging');
+    updateTaskOrder();
+}
+
+// Drag over handler
+function handleDragOver(e) {
+    e.preventDefault();
+    const draggingElement = document.querySelector('.dragging');
+    const afterElement = getDragAfterElement(e.clientY);
+
+    if (afterElement) {
+        taskContainer.insertBefore(draggingElement, afterElement);
+    } else {
+        taskContainer.appendChild(draggingElement);
+    }
+}
+
+// Get element to insert after during drag
+function getDragAfterElement(y) {
+    const draggableElements = [...taskContainer.querySelectorAll('.task-card:not(.dragging)')];
+
+    return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        
+        if (offset < 0 && offset > (closest.offset || Number.NEGATIVE_INFINITY)) {
+            return { offset: offset, element: child };
+        } else {
+            return closest;
+        }
+    }, {}).element;
+}
+
+// Update task order after drag and drop
+async function updateTaskOrder() {
+    try {
+        const taskCards = document.querySelectorAll('.task-card');
+        const updatedTasks = [];
+
+        taskCards.forEach((card, index) => {
+            const taskId = card.dataset.taskId;
+            updatedTasks.push({ 
+                id: taskId, 
+                order: index
+            });
+        });
+
+        const currentTasks = await fetchGetData('http://localhost:3000/tasks');
+
+        const updatePromises = updatedTasks.map(async (updatedTask) => {
+            const fullTaskDetails = currentTasks.find(task => task.id == updatedTask.id);
+            if (fullTaskDetails) {
+                const taskToUpdate = {
+                    ...fullTaskDetails,
+                    order: updatedTask.order
+                };
+                return fetchPutData(`http://localhost:3000/tasks/${updatedTask.id}`, taskToUpdate);
+            }
+        });
+
+        await Promise.all(updatePromises);
+        console.log('Task order updated');
+    } catch (error) {
+        console.error('Error updating task order:', error);
+    }
+}
+
+// Add task functionality
+export const addTask = async () => {
+    const title = document.getElementById('title').value.trim();
+    const description = document.getElementById('description').value.trim();
+    const dueDate = document.getElementById('dueDate').value;
+
+    if (!title) {
+        alert('Le titre est obligatoire');
+        return;
+    }
+
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user) {
+        console.error('Utilisateur non connecté');
+        return;
+    }
+
+    // Check for existing tasks with the same title and description
+    const tasks = await fetchGetData('http://localhost:3000/tasks');
+    const existingTask = tasks.find(task => 
+        task.userId == user.id && 
+        task.titre === title && 
+        task.description === description
+    );
+
+    if (existingTask) {
+        alert('Cette tâche existe déjà');
+        return;
+    }
+
+    // Get the maximum current order for this user's tasks
+    const userTasks = tasks.filter(task => task.userId == user.id);
+    const maxOrder = userTasks.length > 0 
+        ? Math.max(...userTasks.map(task => task.order || 0)) 
+        : 0;
+
+    const newTask = {
+        userId: user.id,
+        titre: title,
+        description: description,
+        date: dueDate,
+        completed: false,
+        libelle: 'Non classé',
+        order: maxOrder + 1  // Increment order instead of always using 0
+    };
+
+    try {
+        await fetchPostData('http://localhost:3000/tasks', newTask);
+        closeModal();
+        await loadUserTasks();
+    } catch (error) {
+        console.error('Erreur lors de l\'ajout de la tâche:', error);
+        alert('Impossible d\'ajouter la tâche. Réessayez.');
+    }
+};
+// Close modal and reset input fields
+function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+    document.getElementById('title').value = '';
+    document.getElementById('description').value = '';
+    document.getElementById('dueDate').value = '';
+}
+
+// Global function handlers
+window.toggleTask = (button) => {
+    const taskCard = button.closest('.task-card');
+    const taskId = taskCard.dataset.taskId;
+    toggleTaskCompletion(taskId);
+};
+
+window.addTask = addTask;
+window.closeModal = closeModal;
+
+// Event listeners setup
+function setupEventListeners() {
+    const searchInput = document.querySelector('.search-container input');
     const selectItems = document.querySelectorAll('.select-items div');
+
+    // Search input listener
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            const filterValue = document.querySelector('.select-selected').textContent.toLowerCase();
+            filterAndSearchTasks(
+                filterValue === 'all' ? 'all' : 
+                filterValue === 'completed' ? 'completed' : 'pending', 
+                searchInput.value
+            );
+        });
+    }
+
+    // Filter dropdown listeners
     selectItems.forEach(item => {
         item.addEventListener('click', () => {
             const filterValue = item.getAttribute('data-value');
@@ -292,17 +368,29 @@ document.addEventListener('DOMContentLoaded', function() {
             filterAndSearchTasks(filterValue, searchInput.value);
         });
     });
+}
 
-    // Search input
-    const searchInput = document.querySelector('.search-container input');
-    searchInput.addEventListener('input', () => {
-        const filterValue = document.querySelector('.select-selected').textContent.toLowerCase();
-        filterAndSearchTasks(
-            filterValue === 'all' ? 'all' : 
-            filterValue === 'completed' ? 'completed' : 'pending', 
-            searchInput.value
-        );
-    });
+// Add this function to your existing code
+// Add event listener for drop
+function handleDarop(e) {
+    e.preventDefault();
+    const taskId = e.dataTransfer.getData('text/plain');
+    const draggedElement = document.querySelector(`.task-card[data-task-id="${taskId}"]`);
+
+    if (draggedElement) {
+        updateTaskOrder();
+    }
+}
+
+// Initialize on DOM load
+document.addEventListener('DOMContentLoaded', () => {
+    loadUserTasks();
+    setupEventListeners();
 });
 
-window.toggleTask = toggleTask;
+export default {
+    loadUserTasks,
+    toggleTaskCompletion,
+    filterAndSearchTasks,
+    addTask
+};

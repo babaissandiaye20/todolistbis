@@ -86,12 +86,39 @@
         <div class="task-container bg-[#D3D3D3] rounded-[32px] p-8 relative">
 
         <!-- Add Button -->
-        <button class="add-button fixed bottom-8 right-8 w-[107px] h-[104px] bg-[#F5F5DC] rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors">
+        <button class="add-button fixed bottom-8 right-8 w-[107px] h-[104px] bg-[#F5F5DC] rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors" onclick="openModal()">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
         </button>
+    </div>
+    <div id="modal" class="fixed z-50 inset-0 overflow-y-auto hidden">
+        <div class="flex justify-end mb-4">
+            
+          </div>
+        <div class="flex items-center justify-center min-h-screen">
+            
+            <div class="bg-[#D3D3D3] rounded-[32px] p-8 w-[650px]">
+                <div class="text-black text-[27px] font-bold font-['Inter'] tracking-wider mb-4">Ajouter une tâche</div>
+                <div class="mb-4">
+                    <label class="block text-black text-[26px] font-normal font-['Inter'] tracking-wider mb-2" for="title">Titre</label>
+                    <input id="title" class="bg-[#F5F5DC] rounded-[10px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] border border-black w-full p-4 text-[26px] font-normal font-['Inter'] tracking-wider" type="text">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-black text-[26px] font-normal font-['Inter'] tracking-wider mb-2" for="description">Description</label>
+                    <textarea id="description" class="bg-[#F5F5DC] rounded-[10px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] border border-black w-full p-4 text-[26px] font-normal font-['Inter'] tracking-wider h-32"></textarea>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-black text-[26px] font-normal font-['Inter'] tracking-wider mb-2" for="dueDate">Date d'échéance</label>
+                    <input id="dueDate" class="bg-[#F5F5DC] rounded-[10px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] border border-black w-full p-4 text-[26px] font-normal font-['Inter'] tracking-wider" type="date">
+                </div>
+                <div class="flex justify-end">
+                    <button class="bg-black text-[#F5F5DC] px-6 py-3 rounded-[06px] text-[26px] font-normal font-['Inter'] tracking-wider hover:bg-gray-800 transition-colors" onclick="closeModal()">Fermer</button>
+                    <button class="bg-black text-[#F5F5DC] px-6 py-3 rounded-[10px] text-[26px] font-normal font-['Inter'] tracking-wider hover:bg-gray-800 transition-colors" onclick="addTask()">Ajouter</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Theme Toggle -->
@@ -137,13 +164,33 @@
      document.body.classList.toggle('dark');
  }
 
- 
+ function openModal() {
+    document.getElementById('modal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+}
+
+function addTask() {
+    const title = document.getElementById('title').value;
+    const description = document.getElementById('description').value;
+    const dueDate = document.getElementById('dueDate').value;
+
+    // Logique d'ajout de la tâche ici
+    console.log('Nouvelle tâche :', { title, description, dueDate });
+
+    closeModal();
+}
 
 
  function filterTasks(value) {
      console.log('Filtering tasks by:', value);
      // Implémentation du filtre à venir
  }
+ function closeModal() {
+  document.getElementById('modal').style.display = 'none';
+}
  
  
 </script> 
