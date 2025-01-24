@@ -1,0 +1,44 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "nom": "Baba Fall",
+      "email": "baba@gmail.com",
+      "password": "passer",
+      "photo": "path/to/user/photo.jpg",
+      "order": 1
+    }
+  ],
+  "tasks": [
+    {
+      "id": "1",
+      "userId": 1,
+      "titre": "Cours Java",
+      "description": "Languages web et mobile très complexe",
+      "date": "2024-01-12",
+      "completed": true,
+      "libelle": "Programmation",
+      "order": 0
+    },
+    {
+      "id": "2",
+      "userId": 1,
+      "titre": "Cours Python",
+      "description": "Apprendre les bases de Python",
+      "date": "2024-01-15",
+      "completed": true,
+      "libelle": "Programmation",
+      "order": 2
+    },
+    {
+      "id": "3",
+      "userId": 1,
+      "titre": "Cours php",
+      "description": "Languages web et mobile très complexe",
+      "date": "2024-01-12",
+      "completed": false,
+      "libelle": "Programmation",
+      "order": 1
+    }
+  ]
+}

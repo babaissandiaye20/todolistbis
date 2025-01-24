@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionnaire de Tâches</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Rubik:wght@400;600&family=Roboto:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="main.css">
+</head>
+<body class="min-h-screen bg-[#F5F5DC] p-8 transition-colors duration-300">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-center sm:items-start gap-4 sm:gap-0 mb-8 sm:mb-12">
+        <div class="w-[80px] h-[80px] sm:w-[100px] sm:h-[100px] rounded-full overflow-hidden bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700">
+            <img 
+                src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop" 
+                alt="Profile" 
+                class="w-full h-full object-cover"
+            />
+        </div>
+        <button class="flex items-center gap-2 bg-[#FF4343] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            <span class="text-base sm:text-xl">Deconnexion</span>
+        </button>
+    </div>
+
+    <!-- Welcome Message -->
+    <h1 class="text-4xl font-bold text-[#090909] dark:text-white tracking-wide mb-8">
+        Bonjour Baba Issa
+    </h1>
+
+    <!-- Title -->
+    <h2 class="text-7xl text-[#090909] dark:text-white mb-12">Liste des taches</h2>
+
+    <!-- Search and Filter -->
+    <div class="flex gap-8 mb-12">
+        <div class="search-container flex-1 flex items-center gap-4 bg-[rgba(211,211,211,0.36)] border border-black rounded-[23px] px-6 py-4">
+            <div class="w-10 h-10 bg-[rgba(0,0,0,0.65)] flex items-center justify-center rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </div>
+            <input type="text" placeholder="Recherche des taches" class="bg-transparent text-2xl font-semibold text-[rgba(0,0,0,0.55)] dark:text-white outline-none flex-1">
+        </div>
+        <div class="filter-container w-[509px] bg-[rgba(211,211,211,0.36)] rounded-[18px]">
+            <div class="custom-select">
+                <div class="select-selected text-[rgba(0,0,0,0.55)] dark:text-white font-semibold">All</div>
+                <div class="select-items">
+                    <div data-value="all" onclick="updateSelect(this, 'all')">All</div>
+                    <div data-value="pending" onclick="updateSelect(this, 'pending')">Pending</div>
+                    <div data-value="completed" onclick="updateSelect(this, 'completed')">Completed</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="task-container bg-[#D3D3D3] rounded-[32px] p-8 relative">
+        <!-- Stats -->
+        <div class="flex gap-8 mb-8">
+            <div class="stats-card flex items-center gap-4 bg-[#F5F5DC] rounded-[27px] border border-[#E3E1DF] px-6 py-4">
+                <div class="w-12 h-12 bg-[#D3D3D3] flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+                <span class="text-3xl">12 Complès</span>
+            </div>
+            <div class="stats-card flex items-center gap-4 bg-[#F5F5DC] rounded-[27px] border border-[#E3E1DF] px-6 py-4">
+                <div class="w-12 h-12 bg-[#D3D3D3] flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                </div>
+                <span class="text-3xl">02 en cours</span>
+            </div>
+        </div>
+
+        <!-- Tasks -->
+        <div class="task-container bg-[#D3D3D3] rounded-[32px] p-8 relative">
+
+        <!-- Add Button -->
+        <button class="add-button fixed bottom-8 right-8 w-[107px] h-[104px] bg-[#F5F5DC] rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Theme Toggle -->
+    <button onclick="toggleTheme()" class="fixed top-8 right-8 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 dark:text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+    </button>
+
+   
+</body>
+ <script>
+
+ // Sélecteur personnalisé
+ const selectSelected = document.querySelector('.select-selected');
+ const selectItems = document.querySelector('.select-items');
+ let isOpen = false;
+
+ selectSelected.addEventListener('click', function(e) {
+     e.stopPropagation();
+     if (!isOpen) {
+         selectItems.style.display = 'block';
+         isOpen = true;
+     } else {
+         selectItems.style.display = 'none';
+         isOpen = false;
+     }
+ });
+
+ document.addEventListener('click', function() {
+     selectItems.style.display = 'none';
+     isOpen = false;
+ });
+
+ function updateSelect(element, value) {
+     selectSelected.textContent = element.textContent;
+     selectItems.style.display = 'none';
+     isOpen = false;
+     filterTasks(value);
+ }
+
+ function toggleTheme() {
+     document.body.classList.toggle('dark');
+ }
+
+ 
+
+
+ function filterTasks(value) {
+     console.log('Filtering tasks by:', value);
+     // Implémentation du filtre à venir
+ }
+ 
+ 
+</script> 
+<script type="module" src="task-management.js"></script>
+</html>

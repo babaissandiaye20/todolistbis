@@ -1,0 +1,62 @@
+body { font-family: 'Rubik', sans-serif; }
+h1 { font-family: 'Inter', sans-serif; }
+.dark { background-color: #1a1a1a; }
+.dark .task-container { background-color: #F5F5DC !important; }
+.dark .task-card { background-color: #4a4a4a; color: #ffffff; }
+.dark .stats-card { background-color: #4a4a4a; color: #ffffff; }
+.dark .search-container { background-color: rgba(74, 74, 74, 0.8); border-color: #666; }
+.dark .filter-container { background-color: rgba(74, 74, 74, 0.8); }
+.dark .add-button { background-color: #4a4a4a; color: #ffffff; }
+.dark .icon-button { color: #ffffff; }
+.custom-select {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+.select-items {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 99;
+    background: #F5F5DC;
+    border-radius: 18px;
+    margin-top: 8px;
+    overflow: hidden;
+    display: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.select-items div {
+    padding: 16px;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.select-items div:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+.select-selected {
+    font-size: 48px;
+    padding: 8px;
+    text-align: center;
+    cursor: pointer;
+}
+.dark .select-items {
+    background: #4a4a4a;
+    color: white;
+}
+.dark .select-items div:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+.task-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.task-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.task-card.dragging {
+    opacity: 0.5;
+    transform: scale(1.02);
+    transition: all 0.2s ease;
+}
