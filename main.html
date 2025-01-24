@@ -94,13 +94,9 @@
         </button>
     </div>
     <div id="modal" class="fixed z-50 inset-0 overflow-y-auto hidden">
-        <div class="flex justify-end mb-4">
-            
-          </div>
         <div class="flex items-center justify-center min-h-screen">
-            
             <div class="bg-[#D3D3D3] rounded-[32px] p-8 w-[650px]">
-                <div class="text-black text-[27px] font-bold font-['Inter'] tracking-wider mb-4">Ajouter une tâche</div>
+                <div class="text-black text-[27px] font-bold font-['Inter'] tracking-wider mb-4 modal-title">Ajouter une tâche</div>
                 <div class="mb-4">
                     <label class="block text-black text-[26px] font-normal font-['Inter'] tracking-wider mb-2" for="title">Titre</label>
                     <input id="title" class="bg-[#F5F5DC] rounded-[10px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] border border-black w-full p-4 text-[26px] font-normal font-['Inter'] tracking-wider" type="text">
@@ -114,7 +110,7 @@
                     <input id="dueDate" class="bg-[#F5F5DC] rounded-[10px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] border border-black w-full p-4 text-[26px] font-normal font-['Inter'] tracking-wider" type="date">
                 </div>
                 <div class="flex justify-end">
-                    <button class="bg-black text-[#F5F5DC] px-6 py-3 rounded-[06px] text-[26px] font-normal font-['Inter'] tracking-wider hover:bg-gray-800 transition-colors" onclick="closeModal()">Fermer</button>
+                    <button class="bg-black text-[#F5F5DC] px-6 py-3 rounded-[06px] text-[26px] font-normal font-['Inter'] tracking-wider hover:bg-gray-800 transition-colors mr-4" onclick="closeModal()">Fermer</button>
                     <button class="bg-black text-[#F5F5DC] px-6 py-3 rounded-[10px] text-[26px] font-normal font-['Inter'] tracking-wider hover:bg-gray-800 transition-colors" onclick="addTask()">Ajouter</button>
                 </div>
             </div>

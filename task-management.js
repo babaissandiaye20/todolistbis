@@ -45,6 +45,71 @@ const updateUserInterface = (user) => {
     }
 };
 
+// Edit task functionality
+export const editTask = async (taskId) => {
+    try {
+        // Fetch the specific task details
+        const response = await fetch(`http://localhost:3000/tasks/${taskId}`);
+        const task = await response.json();
+
+        // Populate modal with task details
+        document.getElementById('title').value = task.titre;
+        document.getElementById('description').value = task.description;
+        document.getElementById('dueDate').value = task.date;
+        
+        // Store the task ID for update
+        document.getElementById('modal').dataset.editTaskId = taskId;
+
+        // Change modal title and button
+        document.querySelector('.modal-title').textContent = 'Modifier la tâche';
+        const addButton = document.querySelector('button[onclick="addTask()"]');
+        addButton.textContent = 'Modifier';
+        addButton.setAttribute('onclick', 'updateTask()');
+
+        // Open the modal
+        document.getElementById('modal').style.display = 'block';
+    } catch (error) {
+        console.error('Error fetching task details:', error);
+    }
+};
+
+// Update task functionality
+export const updateTask = async () => {
+    const taskId = document.getElementById('modal').dataset.editTaskId;
+    const title = document.getElementById('title').value.trim();
+    const description = document.getElementById('description').value.trim();
+    const dueDate = document.getElementById('dueDate').value;
+
+    if (!title) {
+        alert('Le titre est obligatoire');
+        return;
+    }
+
+    try {
+        // Fetch the current task details
+        const response = await fetch(`http://localhost:3000/tasks/${taskId}`);
+        const currentTask = await response.json();
+
+        // Create updated task object
+        const updatedTask = {
+            ...currentTask,
+            titre: title,
+            description: description,
+            date: dueDate
+        };
+
+        // Send update request
+        await fetchPutData(`http://localhost:3000/tasks/${taskId}`, updatedTask);
+        
+        // Close modal and reload tasks
+        closeModal();
+        await loadUserTasks();
+    } catch (error) {
+        console.error('Error updating task:', error);
+        alert('Impossible de modifier la tâche. Réessayez.');
+    }
+};
+
 // Render tasks to the UI
 const renderTasks = (tasks) => {
     // Clear existing tasks
@@ -82,7 +147,7 @@ const createTaskCard = (task) => {
                     <h3 class="text-xl font-normal task-title ${task.completed ? 'line-through' : ''}">${task.titre}</h3>
                     <div class="flex items-center gap-4">
                         <div class="text-xl">Date : <span class="text-base">${formatDate(task.date)}</span></div>
-                        <button class="icon-button w-[75px] h-[30px] bg-black flex items-center justify-center rounded hover:bg-gray-800 transition-colors">
+                        <button onclick="editTask('${task.id}')" class="icon-button w-[75px] h-[30px] bg-black flex items-center justify-center rounded hover:bg-gray-800 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -325,12 +390,22 @@ export const addTask = async () => {
         alert('Impossible d\'ajouter la tâche. Réessayez.');
     }
 };
+
 // Close modal and reset input fields
 function closeModal() {
     document.getElementById('modal').style.display = 'none';
     document.getElementById('title').value = '';
     document.getElementById('description').value = '';
     document.getElementById('dueDate').value = '';
+
+    // Reset modal to default state
+    document.getElementById('modal').removeAttribute('data-edit-task-id');
+    document.querySelector('.modal-title').textContent = 'Ajouter une tâche';
+    const editButton = document.querySelector('button[onclick="updateTask()"]');
+    if (editButton) {
+        editButton.textContent = 'Ajouter';
+        editButton.setAttribute('onclick', 'addTask()');
+    }
 }
 
 // Global function handlers
@@ -340,6 +415,8 @@ window.toggleTask = (button) => {
     toggleTaskCompletion(taskId);
 };
 
+window.editTask = editTask;
+window.updateTask = updateTask;
 window.addTask = addTask;
 window.closeModal = closeModal;
 
@@ -370,18 +447,6 @@ function setupEventListeners() {
     });
 }
 
-// Add this function to your existing code
-// Add event listener for drop
-function handleDarop(e) {
-    e.preventDefault();
-    const taskId = e.dataTransfer.getData('text/plain');
-    const draggedElement = document.querySelector(`.task-card[data-task-id="${taskId}"]`);
-
-    if (draggedElement) {
-        updateTaskOrder();
-    }
-}
-
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', () => {
     loadUserTasks();
@@ -392,5 +457,7 @@ export default {
     loadUserTasks,
     toggleTaskCompletion,
     filterAndSearchTasks,
+    editTask,
+    updateTask,
     addTask
 };
